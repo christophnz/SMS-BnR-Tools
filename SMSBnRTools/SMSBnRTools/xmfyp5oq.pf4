@@ -2,15 +2,22 @@
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.Data;
+using System.Drawing;
 using System.IO;
 using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
 using System.Windows.Forms;
+using System.Xml;
+using System.Xml.Serialization;
 
 namespace SMSBnRTools
 {
     public partial class MainWindow : Form
     {
         private List<contact> contacts;
+        private List<smsesSms> messages;
 
         public MainWindow()
         {
@@ -42,19 +49,47 @@ namespace SMSBnRTools
             filePathInput.Text = file;
 
             XMLReadResult res = XMLFileHelpers.ReadXml(file);
-            if(res.success)
-            {
-                resultLabel.Text = "File read OK";
-                contacts = res.contacts;
-                contactsGV.DataSource = contacts;
-            }
-            else
-            {
-                resultLabel.Text = "Sorry, cannot read the file.";
-            }
+
+            ReadXml(file);
 
             Application.DoEvents();
 
+        }
+
+
+        private void ReadXml(string filename)
+        {
+            XmlSerializer serializer = new XmlSerializer(typeof(smses));
+            // A FileStream is needed to read the XML document.
+            FileStream fs = new FileStream(filename, FileMode.Open);
+
+            // Declare an object variable of the type to be deserialized.
+            smses SMSObj;
+
+            try{
+                // Deserialize the object.
+                SMSObj = (smses)serializer.Deserialize(fs);
+
+                resultLabel.Text = "File read OK";
+
+            }
+            catch
+            {
+                resultLabel.Text = "Sorry, cannot read the file.";
+                return;
+            }
+            fs.Close();
+
+            contacts = SMSObj.Items.OfType<smsesSms>().GroupBy(x => new { x.address, x.contact_name })
+                .Select(y => new contact()
+                {
+                    address = y.Key.address,
+                    contact_name = y.Key.contact_name,
+                    smses = y.ToList()
+                }
+                ).OrderBy(o => o.contact_name).ThenBy(p => p.address).ToList();
+            contacts = contact.ConsolidateContacts(contacts);
+            contactsGV.DataSource = contacts;
         }
 
         #endregion
@@ -134,10 +169,10 @@ namespace SMSBnRTools
             if (contactsGV.CurrentCell.RowIndex > -1 && contactsGV.CurrentCell.OwningRow.DataBoundItem != null)
             {
                 var c = (contact)contactsGV.CurrentCell.OwningRow.DataBoundItem;
-                //if (MessageBox.Show("Are you sure you want to delete the messages for this contact?\nNumber: " + c.address + "\nName: " + c.contact_name, "Delete Contact",
-                //      MessageBoxButtons.YesNo, MessageBoxIcon.Warning)
-                //      == DialogResult.Yes)
-                //{
+                if (MessageBox.Show("Are you sure you want to delete the messages for this contact?\nNumber: " + c.address + "\nName: " + c.contact_name, "Delete Contact",
+                      MessageBoxButtons.YesNo, MessageBoxIcon.Warning)
+                      == DialogResult.Yes)
+                {
                     contacts.Remove(c);
                     contactsGV.EndEdit();
                     contactsGV.DataSource = null;
@@ -146,7 +181,7 @@ namespace SMSBnRTools
                     contactsGV.CurrentCell = null;
                     contactsGV.ClearSelection();
                     DisableButtons();
-                //}
+                }
             }
         }
 
@@ -214,6 +249,8 @@ namespace SMSBnRTools
 
             string file = files[0];
 
+            filePathInput.Text = file;
+
             if (contactsGV.CurrentCell.RowIndex > -1 && contactsGV.CurrentCell.OwningRow.DataBoundItem != null)
             {
                 SaveXml(file, (contact)contactsGV.CurrentCell.OwningRow.DataBoundItem);
@@ -238,50 +275,30 @@ namespace SMSBnRTools
 
         private void SaveXml(string filename, contact c)
         {
-            // Create an instance of the class to be serialized.
-            smses s = new smses();
-            s.Items = c.smses.ToArray();
-
-            // handle existing files - check for duplicate messages, append new
+            // TODO: handle existing files - check for duplicate messages, append new
             if (File.Exists(filename))
             {
-                FileExistsDialog feg = new FileExistsDialog("This file already exists!\nDo you want to merge the messages, overwrite the file or cancel?\n" + filename);
-                feg.Owner = this;
-                feg.StartPosition = FormStartPosition.CenterParent;
+                FileExistsDialog feg = new FileExistsDialog("This file already exists!\nDo you want to merge the messages, overwrite the file or cancel?");
                 DialogResult result = feg.ShowDialog();
-                if (result == System.Windows.Forms.DialogResult.Yes)
+                if(result == System.Windows.Forms.DialogResult.Yes)
                 {
-                    XMLReadResult readResult = XMLFileHelpers.ReadXml(filename);
-                    if (!readResult.success)
-                    {
-                        MessageBox.Show("Error reading file", "The file could not be read as a valid SMS Backup & Restore XML file", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                        return;
-                    }
-                    if (readResult.contacts.Any())
-                    {
-                        List<smsesSms> merged = c.smses;
-                        foreach (var existingContact in readResult.contacts)
-                            merged.AddRange(existingContact.smses);
-
-                        List<smsesSms> removedDupes = merged.GroupBy(g => new { g.date, g.type, g.body }).Select(x => x.First()).OrderBy(o => o.date).ToList();
-                        s.Items = removedDupes.ToArray();
-                    }
-                    else // valid file, but no messages/contacts
-                    {
-                        //s.Items = c.smses.ToArray();
-                    }
 
                 }
                 else if (result == System.Windows.Forms.DialogResult.No)
                 {
-                    //s.Items = c.smses.ToArray();
+
                 }
                 else
                 {
                     return;
                 }
             }
+
+            // Create an instance of the class to be serialized.
+            smses s = new smses();
+            s.Items = c.smses.ToArray();
             s.count = (ushort)s.Items.Count();
+
             XMLFileHelpers.SaveXml(filename, s);
         }
 

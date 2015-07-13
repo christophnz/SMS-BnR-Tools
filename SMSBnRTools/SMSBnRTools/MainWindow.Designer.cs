@@ -267,6 +267,8 @@
             // saveFileDialog1
             // 
             this.saveFileDialog1.DefaultExt = "xml";
+            this.saveFileDialog1.Filter = "XML files (*.xml)|*.xml";
+            this.saveFileDialog1.OverwritePrompt = false;
             this.saveFileDialog1.FileOk += new System.ComponentModel.CancelEventHandler(this.saveFileDialog1_FileOk);
             // 
             // folderBrowserDialog1
@@ -310,15 +312,15 @@
         private System.Windows.Forms.Button btnExportAll;
         private System.Windows.Forms.BindingSource smsesSmsBindingSource;
         private System.Windows.Forms.BindingSource contactBindingSource;
-        private System.Windows.Forms.DataGridViewTextBoxColumn readabledateDataGridViewTextBoxColumn;
-        private System.Windows.Forms.DataGridViewTextBoxColumn typeDataGridViewTextBoxColumn;
-        private System.Windows.Forms.DataGridViewTextBoxColumn bodyDataGridViewTextBoxColumn;
         private System.Windows.Forms.Button btnMerge;
         private System.Windows.Forms.Button btnDelete;
         private System.Windows.Forms.DataGridViewTextBoxColumn addressDataGridViewTextBoxColumn;
         private System.Windows.Forms.DataGridViewTextBoxColumn contactnameDataGridViewTextBoxColumn;
         private System.Windows.Forms.SaveFileDialog saveFileDialog1;
         private System.Windows.Forms.FolderBrowserDialog folderBrowserDialog1;
+        private System.Windows.Forms.DataGridViewTextBoxColumn readabledateDataGridViewTextBoxColumn;
+        private System.Windows.Forms.DataGridViewTextBoxColumn typeDataGridViewTextBoxColumn;
+        private System.Windows.Forms.DataGridViewTextBoxColumn bodyDataGridViewTextBoxColumn;
     }
 }
 
