@@ -46,6 +46,13 @@
   <ItemGroup>
     <Compile Include="classes\contact.cs" />
     <Compile Include="classes\sms.cs" />
+    <Compile Include="classes\XMLFileHelpers.cs" />
+    <Compile Include="FileExistsDialog.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="FileExistsDialog.Designer.cs">
+      <DependentUpon>FileExistsDialog.cs</DependentUpon>
+    </Compile>
     <Compile Include="MainWindow.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -54,6 +61,9 @@
     </Compile>
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <EmbeddedResource Include="FileExistsDialog.resx">
+      <DependentUpon>FileExistsDialog.cs</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="MainWindow.resx">
       <DependentUpon>MainWindow.cs</DependentUpon>
     </EmbeddedResource>
