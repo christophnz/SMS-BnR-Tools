@@ -61,11 +61,16 @@ namespace SMSBnRTools
 
         #region ui
 
-        private void contactsGV_CellClick(object sender, DataGridViewCellEventArgs e)
+        private void contactsGV_SelectionChanged(object sender, EventArgs e)
         {
-            if (contactsGV.CurrentCell.RowIndex > -1 && contactsGV.CurrentCell.OwningRow.DataBoundItem != null)
+            ResetMessagesGrid();
+            if (contactsGV.SelectedRows.Count > 1)
             {
-                ShowMessages((contact)contactsGV.CurrentCell.OwningRow.DataBoundItem);
+                EnableButtons();
+            }
+            else if (contactsGV.SelectedRows.Count == 1 && contactsGV.SelectedRows[0].DataBoundItem != null)
+            {
+                ShowMessagesForRow(contactsGV.SelectedRows[0]);
                 EnableButtons();
             }
             else
@@ -74,8 +79,14 @@ namespace SMSBnRTools
             }
         }
 
+        private void ShowMessagesForRow(DataGridViewRow row)
+        {
+            ShowMessages((contact)row.DataBoundItem);
+        }
+
         private void ShowMessages(contact c)
         {
+            messagesGV.Enabled = true;
             messagesGV.DataSource = c.smses;
             messagesGV.Columns[2].DefaultCellStyle.WrapMode = DataGridViewTriState.True;
         }
@@ -119,8 +130,7 @@ namespace SMSBnRTools
         private void EnableButtons()
         {
             btnDelete.Enabled = true;
-            if (contactsGV.SelectedRows.Count > 1)
-                btnMerge.Enabled = true;
+            btnMerge.Enabled = contactsGV.SelectedRows.Count > 1;
         }
 
         private void DisableButtons()
@@ -129,25 +139,32 @@ namespace SMSBnRTools
             btnMerge.Enabled = false;
         }
 
+        private void ResetGrid()
+        {
+            contactsGV.EndEdit();
+            contactsGV.DataSource = null;
+            contactsGV.DataSource = contacts;
+            contactsGV.Refresh();
+            contactsGV.CurrentCell = null;
+            contactsGV.ClearSelection();
+            messagesGV.DataSource = null;
+            DisableButtons();
+        }
+
+        private void ResetMessagesGrid()
+        {
+            messagesGV.DataSource = null;
+            messagesGV.Enabled = false;
+        }
+
         private void btnDelete_Click(object sender, EventArgs e)
         {
-            if (contactsGV.CurrentCell.RowIndex > -1 && contactsGV.CurrentCell.OwningRow.DataBoundItem != null)
+            foreach (DataGridViewRow row in contactsGV.SelectedRows)
             {
-                var c = (contact)contactsGV.CurrentCell.OwningRow.DataBoundItem;
-                //if (MessageBox.Show("Are you sure you want to delete the messages for this contact?\nNumber: " + c.address + "\nName: " + c.contact_name, "Delete Contact",
-                //      MessageBoxButtons.YesNo, MessageBoxIcon.Warning)
-                //      == DialogResult.Yes)
-                //{
-                    contacts.Remove(c);
-                    contactsGV.EndEdit();
-                    contactsGV.DataSource = null;
-                    contactsGV.DataSource = contacts;
-                    contactsGV.Refresh();
-                    contactsGV.CurrentCell = null;
-                    contactsGV.ClearSelection();
-                    DisableButtons();
-                //}
+                contact c = (contact)row.DataBoundItem;
+                contacts.Remove(c);
             }
+            ResetGrid();
         }
 
         private void btnMerge_Click(object sender, EventArgs e)
@@ -184,21 +201,25 @@ namespace SMSBnRTools
                     contacts.Remove(toMerge);
                 }
                 cMaster.smses = cMaster.smses.OrderBy(o => o.date).ToList();
-                contactsGV.EndEdit();
-                contactsGV.ClearSelection();
-                contactsGV.CurrentCell = null;
-                contactsGV.DataSource = null;
-                contactsGV.DataSource = contacts;
-                contactsGV.Refresh();
-                DisableButtons();
+                ResetGrid();
+                // select the new merged contact
+                foreach(DataGridViewRow row in contactsGV.Rows)
+                {
+                    if((contact)row.DataBoundItem == cMaster)
+                    {
+                        row.Selected = true;
+                        ShowMessagesForRow(row);
+                        break;
+                    }
+                }
             }
         }
 
         private void btnExportSelected_Click(object sender, EventArgs e)
         {
-            if (contactsGV.CurrentCell.RowIndex > -1 && contactsGV.CurrentCell.OwningRow.DataBoundItem != null)
+            if (contactsGV.SelectedRows.Count == 1 && contactsGV.SelectedRows[0].DataBoundItem != null)
             {
-                var c = (contact)contactsGV.CurrentCell.OwningRow.DataBoundItem;
+                var c = (contact)contactsGV.SelectedRows[0].DataBoundItem;
                 saveFileDialog1.FileName = c.contact_name != contact.UNKNOWN_NAME ? c.contact_name : (c.contact_name + " (" + c.address + ")");
                 saveFileDialog1.ShowDialog();
             }
@@ -214,9 +235,9 @@ namespace SMSBnRTools
 
             string file = files[0];
 
-            if (contactsGV.CurrentCell.RowIndex > -1 && contactsGV.CurrentCell.OwningRow.DataBoundItem != null)
+            if (contactsGV.SelectedRows.Count == 1 && contactsGV.SelectedRows[0].DataBoundItem != null)
             {
-                SaveXml(file, (contact)contactsGV.CurrentCell.OwningRow.DataBoundItem);
+                SaveXml(file, (contact)contactsGV.SelectedRows[0].DataBoundItem);
             }
 
             Application.DoEvents();
@@ -286,7 +307,5 @@ namespace SMSBnRTools
         }
 
         #endregion
-
-
     }
 }
