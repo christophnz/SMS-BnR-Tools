@@ -103,7 +103,6 @@
             // 
             // openFileDialog1
             // 
-            this.openFileDialog1.FileName = "openFileDialog1";
             this.openFileDialog1.Filter = "XML files|*.xml";
             this.openFileDialog1.FileOk += new System.ComponentModel.CancelEventHandler(this.openFileDialog1_FileOk);
             // 
@@ -176,7 +175,7 @@
             this.contactsGV.SelectionMode = System.Windows.Forms.DataGridViewSelectionMode.FullRowSelect;
             this.contactsGV.Size = new System.Drawing.Size(254, 454);
             this.contactsGV.TabIndex = 0;
-            this.contactsGV.CellClick += new System.Windows.Forms.DataGridViewCellEventHandler(this.contactsGV_CellClick);
+            this.contactsGV.SelectionChanged += new System.EventHandler(this.contactsGV_SelectionChanged);
             // 
             // addressDataGridViewTextBoxColumn
             // 
