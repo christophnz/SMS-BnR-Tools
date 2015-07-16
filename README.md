@@ -5,6 +5,7 @@ SMS Backup &amp; Restore Tools for Windows
 
 This is a tool built to read, display and split the XML backups created by the Android app SMS Backup & Restore by Ritesh Sahu
 https://play.google.com/store/apps/details?id=com.riteshsahu.SMSBackupRestore
+
 I also took some inspiration from this Java tool, but haven't tried it: http://devadvance.com/sms-backup-reader/
 
 I built this tool mainly to split out the one big XML created by the Android app into single XML files per contact. I know you can also achieve this by creating each backup individually with the app, but that seems a bit tedious if you are planning to do it on a regular basis.
@@ -31,3 +32,4 @@ Currently missing - possible future features
   * Make a program icon ;)
   * Start using version numbers
 
+PS: Sorry for the basic UI and probably poor UX. My background is in web development, so I pretty much just threw this together.
