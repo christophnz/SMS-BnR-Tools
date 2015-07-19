@@ -10,7 +10,7 @@ I also took some inspiration from this Java tool, but haven't tried it: http://d
 
 I built this tool mainly to split out the one big XML created by the Android app into single XML files per contact. I know you can also achieve this by creating each backup individually with the app, but that seems a bit tedious if you are planning to do it on a regular basis.
 
-You can grab the binary (executable) from the binary folder.
+You can grab the binary (executable) from the binary folder. No installation required, you can just run it.
 
 Features
 --------
@@ -22,7 +22,7 @@ Features
   * Export messages for a single contact
   * Export messages for all contacts: This prompts you to select a folder and will generate one XML file per contact
   * File exist options: Merge, overwrite, cancel - Merge will eliminate duplicate messages and add new messages (ordered by date)
-  * The exported XML files have the same format as the original from the app and also references the xsl stylesheet for display in the browser
+  * The exported XML files have the same format as the original from the app and also reference the xsl stylesheet for display in the browser
 
 Currently missing - possible future features
 --------------------------------------------
