@@ -87,7 +87,7 @@ namespace SMSBnRTools
         private void ShowMessages(contact c)
         {
             messagesGV.Enabled = true;
-            messagesGV.DataSource = c.smses;
+            messagesGV.DataSource = c.messages;
             messagesGV.Columns[2].DefaultCellStyle.WrapMode = DataGridViewTriState.True;
         }
 
@@ -177,10 +177,10 @@ namespace SMSBnRTools
                 for (int i = 0; i < contactsGV.SelectedRows.Count; i++)
                 {
                     contact c = (contact)contactsGV.SelectedRows[i].DataBoundItem;
-                    if (c.smses.OrderBy(o => o.date).Last().date > latestDate)
+                    if (c.messages.OrderBy(o => o.date).Last().date > latestDate)
                     {
                         latestIndex = i;
-                        latestDate = c.smses.OrderBy(o => o.date).Last().date;
+                        latestDate = c.messages.OrderBy(o => o.date).Last().date;
                     }
                 }
 
@@ -190,7 +190,7 @@ namespace SMSBnRTools
                     if (i == latestIndex) // ignore the master contact
                         continue;
                     contact toMerge = (contact)contactsGV.SelectedRows[i].DataBoundItem;
-                    cMaster.smses.AddRange(toMerge.smses);
+                    cMaster.messages.AddRange(toMerge.messages);
                     // use the number that is associated with a contact_name
                     // TODO: select which contact to merge to?
                     if(cMaster.contact_name == contact.UNKNOWN_NAME && toMerge.contact_name != contact.UNKNOWN_NAME)
@@ -200,7 +200,7 @@ namespace SMSBnRTools
                     }
                     contacts.Remove(toMerge);
                 }
-                cMaster.smses = cMaster.smses.OrderBy(o => o.date).ToList();
+                cMaster.messages = cMaster.messages.OrderBy(o => o.date).ToList();
                 ResetGrid();
                 // select the new merged contact
                 foreach(DataGridViewRow row in contactsGV.Rows)
@@ -261,7 +261,7 @@ namespace SMSBnRTools
         {
             // Create an instance of the class to be serialized.
             smses s = new smses();
-            s.Items = c.smses.ToArray();
+            s.Items = c.messages.ToArray();
 
             // handle existing files - check for duplicate messages, append new
             if (File.Exists(filename))
@@ -280,11 +280,11 @@ namespace SMSBnRTools
                     }
                     if (readResult.contacts.Any())
                     {
-                        List<smsesSms> merged = c.smses;
+                        List<IMobileMessage> merged = c.messages;
                         foreach (var existingContact in readResult.contacts)
-                            merged.AddRange(existingContact.smses);
+                            merged.AddRange(existingContact.messages);
 
-                        List<smsesSms> removedDupes = merged.GroupBy(g => new { g.date, g.type, g.body }).Select(x => x.First()).OrderBy(o => o.date).ToList();
+                        List<IMobileMessage> removedDupes = merged.GroupBy(g => new { g.date, g.sentReceived, g.bodyText }).Select(x => x.First()).OrderBy(o => o.date).ToList();
                         s.Items = removedDupes.ToArray();
                     }
                     else // valid file, but no messages/contacts

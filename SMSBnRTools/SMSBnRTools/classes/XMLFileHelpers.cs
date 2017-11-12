@@ -42,12 +42,12 @@ namespace SMSBnRTools.classes
 
             if (SMSObj.count > 0)
             {
-                res.contacts = SMSObj.Items.OfType<smsesSms>().GroupBy(x => new { x.address, x.contact_name })
+                res.contacts = SMSObj.Items.OfType<IMobileMessage>().GroupBy(x => new { x.address, x.contact_name })
                     .Select(y => new contact()
                     {
                         address = y.Key.address,
                         contact_name = y.Key.contact_name,
-                        smses = y.ToList()
+                        messages = y.OrderBy(o => o.date).ToList()
                     }
                     ).OrderBy(o => o.contact_name).ThenBy(p => p.address).ToList();
                 res.contacts = contact.ConsolidateContacts(res.contacts);
