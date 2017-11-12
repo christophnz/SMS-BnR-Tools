@@ -8,7 +8,7 @@ namespace SMSBnRTools.classes
         public const string UNKNOWN_NAME = "(Unknown)";
         public string address { get; set; }
         public string contact_name { get; set; }
-        public List<smsesSms> smses { get; set; }
+        public List<IMobileMessage> messages { get; set; }
 
         /// <summary>
         /// merges messages from addresses with and without country code
@@ -24,8 +24,8 @@ namespace SMSBnRTools.classes
                 if (contax.Any(x => !x.address.StartsWith("0") && x.address.EndsWith(c.address.Substring(1))))
                 {
                     contact cMerge = contax.First(x => !x.address.StartsWith("0") && x.address.EndsWith(c.address.Substring(1)));
-                    cMerge.smses.AddRange(c.smses);
-                    cMerge.smses = cMerge.smses.OrderBy(o => o.date).ToList();
+                    cMerge.messages.AddRange(c.messages);
+                    cMerge.messages = cMerge.messages.OrderBy(o => o.date).ToList();
                     contax.Remove(c);
                 }
             }

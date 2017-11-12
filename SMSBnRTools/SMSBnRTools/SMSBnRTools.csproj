@@ -45,6 +45,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="classes\contact.cs" />
+    <Compile Include="classes\IMobileMessage.cs" />
     <Compile Include="classes\sms.cs" />
     <Compile Include="classes\XMLFileHelpers.cs" />
     <Compile Include="FileExistsDialog.cs">
@@ -77,6 +78,7 @@
       <DependentUpon>Resources.resx</DependentUpon>
     </Compile>
     <None Include="Properties\DataSources\SMSBnRTools.classes.contact.datasource" />
+    <None Include="Properties\DataSources\SMSBnRTools.classes.IMobileMessage.datasource" />
     <None Include="Properties\DataSources\smsesSms.datasource" />
     <None Include="Properties\Settings.settings">
       <Generator>SettingsSingleFileGenerator</Generator>
