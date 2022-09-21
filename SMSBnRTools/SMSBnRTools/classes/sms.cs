@@ -104,7 +104,7 @@ public partial class smsesMms : IMobileMessage {
     
     private string m_idField;
     
-    private byte date_sentField;
+    private ulong date_sentField;
     
     private byte seenField;
     
@@ -114,7 +114,7 @@ public partial class smsesMms : IMobileMessage {
     
     private string expField;
     
-    private byte priField;
+    private string priField;
     
     private byte rrField;
     
@@ -367,7 +367,7 @@ public partial class smsesMms : IMobileMessage {
     
     /// <remarks/>
     [System.Xml.Serialization.XmlAttributeAttribute()]
-    public byte date_sent {
+    public ulong date_sent {
         get {
             return this.date_sentField;
         }
@@ -422,7 +422,7 @@ public partial class smsesMms : IMobileMessage {
     
     /// <remarks/>
     [System.Xml.Serialization.XmlAttributeAttribute()]
-    public byte pri {
+    public string pri {
         get {
             return this.priField;
         }
